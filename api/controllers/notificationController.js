@@ -33,3 +33,13 @@ exports.findNotificationByReceiverId = (req, res) => {
       res.status(500).send('Error finding notifications');
     });
 };
+
+exports.deleteAllNotifications = (req,res) =>{
+  Notification.deleteMany({})
+  .then(notification=>{
+    res.status(200).json({ message: 'Notifications deleted successfully' });
+  })
+  .catch((error) => {
+    res.status(500).json({ message: 'Error deleting notification' });
+  });
+}

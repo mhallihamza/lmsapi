@@ -7,4 +7,5 @@ router.get("/:id",Exam.getExamsByStudentId)
 router.get("/teacher/:id",Exam.getExamsByTeacherId)
 router.get("/class/:id/:classId",Exam.getExamsByclass)
 router.get("/admin/:classId",Exam.getExamsByadmin)
+router.delete("/:id",Exam.deleteExam)
 module.exports = router

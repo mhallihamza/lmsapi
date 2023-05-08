@@ -4,7 +4,7 @@ const {verifyToken,verifyUser,verifyAdmin} = require('../../utils/verifyToken')
 
 // create App function
 module.exports = function (app) {
-  var userList = require('../controllers/userController')
+  var userList = require('../controllers/userController');
 
   // userList Routes
 

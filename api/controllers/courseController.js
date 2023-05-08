@@ -68,3 +68,18 @@ exports.getCoursesByInstructorId = (req, res) => {
       res.status(500).send(err);
     });
 };
+
+exports.deleteCourse = (req, res) => {
+  const id = req.params.id;
+  Course.findOneAndDelete({ _id: id })
+    .then((course) => {
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+
+      res.status(200).json({ message: 'Course deleted successfully' });
+    })
+    .catch((error) => {
+      res.status(500).json({ message: 'Error deleting course' });
+    });
+};

@@ -77,3 +77,18 @@ exports.getExerciceByTeacherId  = (req, res) => {
         res.status(500).send(err);
     })
     };
+
+    exports.deleteExercice = (req, res) => {
+      const id = req.params.id;
+      Exercice.findOneAndDelete({ _id: id })
+        .then((exercice) => {
+          if (!exercice) {
+            return res.status(404).json({ message: 'Exercice not found' });
+          }
+    
+          res.status(200).json({ message: 'Exercice deleted successfully' });
+        })
+        .catch((error) => {
+          res.status(500).json({ message: 'Error deleting exercice' });
+        });
+    };

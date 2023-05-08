@@ -6,4 +6,5 @@ router.post("",Exercice.createNewexercice)
 router.get("",Exercice.listAllExercice)
 router.get("/:id",Exercice.getExerciceByStudentId)
 router.get("/teacher/:id",Exercice.getExerciceByTeacherId)
+router.delete("/:id",Exercice.deleteExercice)
 module.exports = router

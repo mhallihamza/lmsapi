@@ -14,7 +14,7 @@ exports.verifyToken = (req,res,next)=>{
 }
 exports.verifyUser = (req,res,next)=>{
     exports.verifyToken(req,res,next, ()=>{
-        if(req.user.id===req.params.id || req.user.isAdmin){
+        if(req.user.id===req.params.id || req.user.role === 'admin'){
             next()
         }
         else {
@@ -24,7 +24,7 @@ exports.verifyUser = (req,res,next)=>{
 }
 exports.verifyAdmin = (req,res,next)=>{
     exports.verifyToken(req,res,next, ()=>{
-        if(req.user.isAdmin){
+        if(req.user.role === 'admin'){
             next()
         }
         else {

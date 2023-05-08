@@ -21,9 +21,30 @@
             type:String,
             required:true,
         },
-        isAdmin:{
-            type:Boolean,
-            default:false
+        image:{
+            type: String,
+        },
+        class: {
+            type: String,
+        },
+        role:{ 
+            type: String,
+             enum: ['student', 'instructor', 'admin'], default: 'student' 
+            },
+        phone :{
+            type: String,
+        },
+        joiningdate :{
+            type: Date,
+        },
+        gender :{
+            type: String,
+        },
+        parent :{
+            type: String,
+        },
+        admissiondate :{
+            type: Date,
         },
         createdOn: {
             type:Date,

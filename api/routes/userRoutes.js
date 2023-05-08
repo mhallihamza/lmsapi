@@ -9,13 +9,13 @@ module.exports = function (app) {
   // userList Routes
 
   // get and post request for /users endpoints
-  app.route('/users').get(verifyAdmin,userList.listAllUsers).post(verifyAdmin,userList.createNewUser)
+  app.route('/users').get(userList.listAllUsers).post(verifyAdmin,userList.createNewUser)
 
   // put and delete request for /users endpoints
   app
     .route('/user/:id')
-    .put(verifyUser,userList.updateUser)
-    .delete(verifyUser,userList.deleteUser)
+    .put(userList.updateUser)
+    .delete(userList.deleteUser)
     .get(verifyUser,userList.findUser)
   //
   app

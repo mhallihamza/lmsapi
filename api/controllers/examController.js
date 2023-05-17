@@ -2,6 +2,7 @@
 const Exam = require('../models/Exam');
 const Class = require('../models/Class')
 const Course = require('../models/Course');
+const Note = require('../models/Note');
 // DEFINE CONTROLLER FUNCTIONS
 
 // listAllUser function - To list all Users
@@ -118,7 +119,13 @@ exports.deleteExam = (req, res) => {
             if (!exam) {
               return res.status(404).json({ message: 'Exam not found' });
             }
-      
+            Note.deleteMany({ exam: exam._id })
+            .then((note) => {
+               !note ? console.log("Note not found") : console.log("Note deleted successfully")
+            })
+            .catch((error) => {
+              res.status(500).json({ message: 'Error deleting note' });
+            });
             res.status(200).json({ message: 'Exam deleted successfully' });
           })
           .catch((error) => {

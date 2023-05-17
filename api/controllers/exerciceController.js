@@ -69,7 +69,7 @@ exports.getExerciceByTeacherId  = (req, res) => {
   };
 
   exports.listAllExercice = (req, res) => {
-    Exercice.find({})
+    Exercice.find({}).populate('course','title').exec()
     .then(user=>{
         res.status(200).json(user);
     })

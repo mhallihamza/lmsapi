@@ -1,5 +1,4 @@
 const Class = require('../models/Class');
-const User = require('../models/User');
 const Course = require('../models/Course');
 // listAllClass function - To list all Users
 exports.listAllClass = (req, res) => {

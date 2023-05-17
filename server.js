@@ -13,6 +13,7 @@ const noteRoutes = require('./api/routes/noteRoutes')
 const notificationRoutes = require('./api/routes/notificationRoutes')
 const scheduleRoutes = require('./api/routes/scheduleRoutes')
 const courseRoutes = require('./api/routes/courseRoutes')
+const paymentRoutes = require('./api/routes/paymentRoutes')
 const routes = require('./api/routes/userRoutes');
 const cookieParser = require('cookie-parser');
 const upload = require('./api/routes/upload');
@@ -43,6 +44,7 @@ app.use('/note',noteRoutes);
 app.use('/notification',notificationRoutes);
 app.use('/schedule',scheduleRoutes);
 app.use('/course',courseRoutes);
+app.use('/payment',paymentRoutes);
 // Add endpoint
 app.get('/', (req, res) => {
 res.send("Hello World");

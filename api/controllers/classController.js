@@ -1,5 +1,13 @@
 const Class = require('../models/Class');
 const Course = require('../models/Course');
+const Attendance = require('../models/Attendance');
+const Payment = require('../models/Payment');
+const Schedule = require('../models/Schedule');
+const Exam = require('../models/Exam');
+const User = require('../models/User');
+const Exercice = require('../models/Exercice');
+const Note = require('../models/Note');
+const Notification = require('../models/Notification');
 // listAllClass function - To list all Users
 exports.listAllClass = (req, res) => {
 Class.find({}).populate("students","username image gender")
@@ -63,16 +71,110 @@ exports.listClassbystudent = (req, res) => {
   };
 
   exports.deleteClass = (req, res) => {
-    const id = req.params.id;
-    Class.findOneAndDelete({ _id: id })
-      .then((cls) => {
-        if (!cls) {
+    const classId = req.params.id;
+  
+    // Delete Class
+    Class.findOneAndDelete({ _id: classId })
+      .then((deletedClass) => {
+        if (!deletedClass) {
           return res.status(404).json({ message: 'Class not found' });
         }
   
-        res.status(200).json({ message: 'Class deleted successfully' });
+        // Delete associated courses
+        Course.deleteMany({ class: classId })
+          .then(() => {
+            // Delete associated exams
+            Exam.deleteMany({ course: { $in: deletedClass.courses } })
+              .then(() => {
+                // Delete associated exercises
+                Exercice.deleteMany({ course: { $in: deletedClass.courses } })
+                  .then(() => {
+                    // Find the users in the class
+                    User.find({ class: classId }, '_id')
+                      .then((users) => {
+                        const userIds = users.map((user) => user._id);
+  
+                        // Delete associated attendance
+                        Attendance.deleteMany({ class: classId })
+                          .then(() => {
+                            // Delete associated schedules
+                            Schedule.deleteMany({ class: classId })
+                              .then(() => {
+                                // Delete associated payments
+                                Payment.deleteMany({ student: { $in: userIds } })
+                                  .then(() => {
+                                    // Delete associated notes
+                                    Note.deleteMany({ class: classId })
+                                      .then(() => {
+                                        // Delete associated notifications
+                                        Notification.deleteMany({ receiver: { $in: userIds } })
+                                          .then(() => {
+                                            // Delete associated users
+                                            User.deleteMany({ class: classId })
+                                              .then(() => {
+                                                res.status(200).json({ message: 'Class and associated data deleted successfully' });
+                                              })
+                                              .catch((error) => {
+                                                res.status(500).json({ message: 'Error deleting users' });
+                                              });
+                                          })
+                                          .catch((error) => {
+                                            res.status(500).json({ message: 'Error deleting notifications' });
+                                          });
+                                      })
+                                      .catch((error) => {
+                                        res.status(500).json({ message: 'Error deleting notes' });
+                                      });
+                                  })
+                                  .catch((error) => {
+                                    res.status(500).json({ message: 'Error deleting payments' });
+                                  });
+                              })
+                              .catch((error) => {
+                                res.status(500).json({ message: 'Error deleting schedules' });
+                              });
+                          })
+                          .catch((error) => {
+                            res.status(500).json({ message: 'Error deleting attendance' });
+                          });
+                      })
+                      .catch((error) => {
+                        res.status(500).json({ message: 'Error finding users' });
+                      });
+                  })
+                  .catch((error) => {
+                    res.status(500).json({ message: 'Error deleting exercises' });
+                  });
+              })
+              .catch((error) => {
+                res.status(500).json({ message: 'Error deleting exams' });
+              });
+          })
+          .catch((error) => {
+            res.status(500).json({ message: 'Error deleting courses' });
+          });
       })
       .catch((error) => {
         res.status(500).json({ message: 'Error deleting class' });
       });
   };
+  
+exports.updateClass = (req, res) => {
+  Class.findOneAndUpdate(
+    {
+      _id: req.params.id // search query
+    },
+    req.body, // field:values to update
+    {
+      new: true, // return updated doc
+      runValidators: true // validate before update
+    }
+  )
+    .then(user => {
+      res.status(200).json(user);
+    })
+    .catch(err => {
+      res.status(500).send(err);
+    });
+}
+  

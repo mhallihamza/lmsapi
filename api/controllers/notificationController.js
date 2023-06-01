@@ -43,3 +43,13 @@ exports.deleteAllNotifications = (req,res) =>{
     res.status(500).json({ message: 'Error deleting notification' });
   });
 }
+
+exports.deleteNotificationsToStudent = (req,res) =>{
+  Notification.deleteMany({receiver:req.params.id})
+  .then(notification=>{
+    res.status(200).json({ message: 'Notifications deleted successfully' });
+  })
+  .catch((error) => {
+    res.status(500).json({ message: 'Error deleting notification' });
+  });
+}

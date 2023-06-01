@@ -18,7 +18,7 @@ const routes = require('./api/routes/userRoutes');
 const cookieParser = require('cookie-parser');
 const upload = require('./api/routes/upload');
 const path = require('path');
-require('dotenv').config()
+require('dotenv').config();
 // Import DB Connection
 require("./config/db");
 

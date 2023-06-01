@@ -5,5 +5,6 @@ router.get("",Class.listAllClass);
 router.post("",Class.createNewClass);
 router.get("/student/:id",Class.listClassbystudent);
 router.get("/teacher/:id",Class.listClassbyteacher);
-router.delete("/:id",Class.deleteClass)
+router.delete("/:id",Class.deleteClass);
+router.put("/:id",Class.updateClass);
 module.exports = router

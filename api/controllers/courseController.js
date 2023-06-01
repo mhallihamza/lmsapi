@@ -1,6 +1,9 @@
 const Course = require('../models/Course');
 const Class = require('../models/Class');
-
+const Schedule = require('../models/Schedule');
+const Exam = require('../models/Exam');
+const Exercice = require('../models/Exercice');
+const Note = require('../models/Note');
 exports.listAllCourse = (req, res) => {
   Course.find({})
   .populate('instructor','username')
@@ -30,6 +33,7 @@ exports.createNewCourse = (req, res) => {
           .then(cls => {
             cls.courses.push(courseDoc._id);
             cls.save();
+            res.status(201).json(courseDoc);
           })
           .catch(err => {
             console.error(err);
@@ -70,16 +74,107 @@ exports.getCoursesByInstructorId = (req, res) => {
 };
 
 exports.deleteCourse = (req, res) => {
-  const id = req.params.id;
-  Course.findOneAndDelete({ _id: id })
+  const courseId = req.params.id;
+
+  // Delete Course
+  Course.findOneAndDelete({ _id: courseId })
     .then((course) => {
       if (!course) {
         return res.status(404).json({ message: 'Course not found' });
       }
 
-      res.status(200).json({ message: 'Course deleted successfully' });
+      // Get the list of exams associated with the course
+      Exam.find({ course: courseId })
+        .then((exams) => {
+          const examIds = exams.map((exam) => exam._id);
+
+          // Delete associated notes
+          Note.deleteMany({ exam: { $in: examIds } })
+            .then(() => {
+              // Delete associated exams
+              Exam.deleteMany({ course: courseId })
+                .then(() => {
+                  // Delete associated exercises
+                  Exercice.deleteMany({ course: courseId })
+                    .then(() => {
+                      // Delete associated schedules
+                      Schedule.deleteMany({ course: courseId })
+                        .then(() => {
+                          // Delete course from the courses array in Class model
+                          Class.updateMany(
+                            { courses: courseId },
+                            { $pull: { courses: courseId } }
+                          )
+                            .then(() => {
+                              res.status(200).json({ message: 'Course and associated data deleted successfully' });
+                            })
+                            .catch((error) => {
+                              res.status(500).json({ message: 'Error deleting course from Class model' });
+                            });
+                        })
+                        .catch((error) => {
+                          res.status(500).json({ message: 'Error deleting schedules' });
+                        });
+                    })
+                    .catch((error) => {
+                      res.status(500).json({ message: 'Error deleting exercises' });
+                    });
+                })
+                .catch((error) => {
+                  res.status(500).json({ message: 'Error deleting exams' });
+                });
+            })
+            .catch((error) => {
+              res.status(500).json({ message: 'Error deleting notes' });
+            });
+        })
+        .catch((error) => {
+          res.status(500).json({ message: 'Error finding exams' });
+        });
     })
     .catch((error) => {
       res.status(500).json({ message: 'Error deleting course' });
     });
 };
+
+exports.updateCourse = (req, res) => {
+  const courseId = req.params.id;
+  const { title, description, instructor, startTime, endTime, classId } = req.body;
+
+  Course.findOneAndUpdate(
+    { _id: courseId }, // search query
+    { title, description, instructor, class: classId, startTime, endTime }, // field:values to update
+    { new: true, runValidators: true } // options
+  )
+    .then(updatedCourse => {
+       Class.findOneAndUpdate(
+        { courses: courseId },
+        { $pull: { courses: courseId } },
+        { new: true }
+      ).exec()
+        .then(() => {
+           Class.findOneAndUpdate(
+            { _id: classId },
+            { $push: { courses: courseId } },
+            { new: true }
+          ).exec()
+          .then(() => {
+            res.status(200).json(updatedCourse);
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).json({ message: 'Server error' });
+        });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).json({ message: 'Server error' });
+        });
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    });
+};
+
+

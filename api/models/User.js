@@ -25,7 +25,8 @@
             type: String,
         },
         class: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'Class',
         },
         role:{ 
             type: String,

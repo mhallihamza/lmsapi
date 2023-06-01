@@ -5,16 +5,23 @@ const Class = require('../models/Class')
 // DEFINE CONTROLLER FUNCTIONS
 
 // createNewUser function - To create new User
-exports.createNewSchedule = (req, res) => {
-    let newSchedule = new Schedule(req.body);
-    newSchedule.save()
-      .then(schedule => {
-        res.status(201).json(schedule);
-      })
-      .catch(err => {
-        res.status(500).send(err);
-      });
-  };
+exports.createOrUpdateSchedule = (req, res) => {
+  const { class: classId, course: courseId, weekday, startTime, endTime, subject, room } = req.body;
+
+  Schedule.findOneAndUpdate(
+    { class: classId, course: courseId, weekday, startTime, endTime }, // search query
+    {subject, room }, // field:values to update
+    { upsert: true, new: true, runValidators: true } // options (upsert will create a new schedule if not found)
+  )
+    .then(schedule => {
+      res.status(200).json(schedule);
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    });
+};
+
 
   exports.getAllSchedule  = (req, res) => {
     Schedule.find({}).populate({

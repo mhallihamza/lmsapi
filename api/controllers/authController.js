@@ -45,7 +45,7 @@ exports.register = (req, res) => {
     .then((user) => {
       console.log(user);
       if (user.role === 'student' && req.body.class) {
-        Class.findOne({name:req.body.class})
+        Class.findById(req.body.class)
           .then(cls => {
             cls.students.push(user._id);
             cls.save();
@@ -63,7 +63,7 @@ exports.register = (req, res) => {
 exports.login = (req, res, next) => {
   User.findOne({
     email: req.body.email, // search query
-  })
+  }).populate("class","name")
     .then((user) => {
       if (!user) {
         // handle user not found error

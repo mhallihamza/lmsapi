@@ -54,7 +54,8 @@ exports.findAttendancebydateandclass = (req, res) => {
       "students.user": userId,
     })
     .populate("students.user", "username") // populate user info
-      .select("date class students.status")
+    .populate("class", "name")
+    .select("date class students.status")
     .then(user=>{
         res.status(200).json(user);
     })

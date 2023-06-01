@@ -33,3 +33,13 @@ exports.createNewPayment = (req, res) => {
       res.status(500).send(err);
     });
 };
+
+exports.listPaymentbystudent = (req, res) => {
+  Payment.find({student:req.params.id}).populate("student","username image gender")
+  .then(py=>{
+      res.status(200).json(py);
+  })
+  .catch(err=>{
+      res.status(500).send(err);
+  })
+  };
